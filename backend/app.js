@@ -30,6 +30,11 @@ app.use('/api/v1', products)
 app.use('/api/v1', auth)
 app.use('/api/v1', order)
 
+app.use('/', express.static(__dirname + '/uploads'))
+app.use('/me', express.static(__dirname + '/uploads'))
+app.use('/', express.static(__dirname + '/uploads/product'))
+app.use('/admin/product', express.static(__dirname + '/uploads/product'))
+
 if (process.env.NODE_ENV === 'PRODUCTION') {
     app.use(express.static(path.join(__dirname, '../frontend/build')))
 
@@ -38,10 +43,6 @@ if (process.env.NODE_ENV === 'PRODUCTION') {
     })
 }
 
-app.use('/', express.static(__dirname + '/uploads'))
-app.use('/me', express.static(__dirname + '/uploads'))
-app.use('/', express.static(__dirname + '/uploads/product'))
-app.use('/admin/product', express.static(__dirname + '/uploads/product'))
 
 
 // app.get('/', (req, res) => {

@@ -12,7 +12,6 @@ import { allUsers } from '../../actions/userActions'
 
 const Dashboard = () => {
     const dispatch = useDispatch();
-
     const { products } = useSelector(state => state.products)
     const { orders, totalAmount, loading } = useSelector(state => state.allOrders)
     const { users } = useSelector(state => state.allUsers)
