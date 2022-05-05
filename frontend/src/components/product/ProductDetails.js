@@ -10,6 +10,7 @@ import {
   newReview,
   clearErrors,
   getRelatedProducts,
+  getProductReviews1,
 } from "../../actions/productActions";
 import { addItemToCart } from "../../actions/cartActions";
 import { NEW_REVIEW_RESET } from "../../constants/productConstants";
@@ -38,14 +39,17 @@ const ProductDetails = ({ match }) => {
   const [comment, setComment] = useState("");
   const dispatch = useDispatch();
   const alert = useAlert();
-  const { loading, error, product } = useSelector((state) => state.productDetails);
+  const { loading, error, product, productImages,RelatedProductImages } = useSelector((state) => state.productDetails);
+  const { reviews } = useSelector(state => state.productReviews);
+
   const { user } = useSelector((state) => state.auth);
   const { error: reviewError, success } = useSelector((state) => state.newReview);
   const { productsRelated } = useSelector((state) => state.productsRelated);
   const pCategory = product.category;
   useEffect(() => {
-    if (!product._id || product._id !== match.params.id) {
+    if (!product.id || product.id !== match.params.id) {
       dispatch(getProductDetails(match.params.id))
+      dispatch(getProductReviews1(match.params.id))
     }
     if (error) {
       alert.error(error);
@@ -66,7 +70,7 @@ const ProductDetails = ({ match }) => {
   }, [
     dispatch,
     pCategory,
-    product._id,
+    product.id,
     alert,
     error,
     reviewError,
@@ -127,7 +131,13 @@ const ProductDetails = ({ match }) => {
     formData.set("rating", rating);
     formData.set("comment", comment);
     formData.set("productId", match.params.id);
-    dispatch(newReview(formData));
+
+    var object = {};
+    formData.forEach((value, key) => object[key] = value);
+    var json = object
+    console.log(json)
+
+    dispatch(newReview(json));
   };
   let settings = {
     infinite: false,
@@ -153,6 +163,20 @@ const ProductDetails = ({ match }) => {
     ],
   };
   const currentURL = window.location.href;
+
+  // var ImageUrl;
+  // if (productImages) {
+  //   productImages.map((productImage) => {
+  //     if (product.id === productImage.productid)
+  //       ImageUrl = productImage.url;
+  //     // console.log("productImage...", ImageUrl);
+  //   })
+  // }
+if(productsRelated && productImages){
+console.log("productsRelated",productsRelated);
+console.log("productImages",productImages);
+console.log("RelatedProductImages",RelatedProductImages);
+}
   return (
     <Fragment>
       {loading ? (
@@ -161,225 +185,226 @@ const ProductDetails = ({ match }) => {
         <Fragment>
           <MetaData title={product.name} />
           <div className="container-fluid">
-          <div className="container-fluid">
-            <div className="row d-flex justify-content-around">
-              <div className="col-12 col-lg-5 img-fluid" id="product_image">
-                <Carousel pause="hover" interval={null}>
-                  {product.images &&
-                    product.images.map((image) => (
-                      <Carousel.Item key={image.public_id}>
-                        <div className="gallery">
-                          <ImageZoom
-                            className="gallery-img d-block "
-                            src={image.url}
-                            alt={product.title}
-                          />
-                        </div>
-                      </Carousel.Item>
-                    ))}
-                </Carousel>
-              </div>
-
-              <div className="col-12 col-lg-6 mt-5">
-                <div className="social">
-                  <EmailShareButton
-                    url={currentURL}
-                    quote={"フェイスブックはタイトルが付けれるようです"}
-                    hashtag={"#hashtag"}
-                    description={"aiueo"}
-                    className="Demo__some-network__share-button"
-                  >
-                    <EmailIcon size={24} round />
-                    &nbsp;
-                  </EmailShareButton>
-                  <FacebookShareButton
-                    url={currentURL}
-                    quote={"フェイスブックはタイトルが付けれるようです"}
-                    hashtag={"#hashtag"}
-                    description={"aiueo"}
-                    className="Demo__some-network__share-button"
-                  >
-                    <FacebookIcon size={24} round />
-                    &nbsp;
-                  </FacebookShareButton>
-                  <TwitterShareButton
-                    title={"test"}
-                    url={currentURL}
-                    hashtags={["hashtag1", "hashtag2"]}
-                  >
-                    <TwitterIcon size={24} round />
-                    &nbsp;
-                  </TwitterShareButton>
-                  <WhatsappShareButton
-                    url={currentURL}
-                    quote={"フェイスブックはタイトルが付けれるようです"}
-                    hashtag={"#hashtag"}
-                    description={"aiueo"}
-                    className="Demo__some-network__share-button"
-                  >
-                    <WhatsappIcon size={24} round />
-                    &nbsp;
-                  </WhatsappShareButton>
-                  <PinterestShareButton
-                    url={currentURL}
-                    quote={"フェイスブックはタイトルが付けれるようです"}
-                    hashtag={"#hashtag"}
-                    description={"aiueo"}
-                    className="Demo__some-network__share-button"
-                  >
-                    <PinterestIcon size={24} round />
-                    &nbsp;
-                  </PinterestShareButton>
-                </div>
-                <br />
-                <h3>{product.name}</h3>
-                <p id="product_id">Product # {product._id}</p>
-
-                <hr />
-
-                <div className="rating-outer">
-                  <div
-                    className="rating-inner"
-                    style={{ width: `${(product.ratings / 5) * 100}%` }}
-                  ></div>
-                </div>
-                <span id="no_of_reviews">({product.numOfReviews} Reviews)</span>
-                <hr />
-                <p>
-                  {" "}
-                  <span id="product_price">
-                    &#8377;{product.discountPrice?.toFixed(2)}{" "}
-                  </span>
-                  <span>
-                    {product.discount > 0 ? (
-                      <span className="text-secondary discount-label">
-                        /-<del>&#8377;{product.price}</del>,
-                        <span className="text-success">
-                          {" "}
-                          {product.discount}% off
-                        </span>
-                      </span>
-                    ) : (
-                      ""
-                    )}
-                  </span>
-                </p>
-                <div className="stockCounter d-inline">
-                  <span className="btn minus-btn" onClick={decreaseQty}>
-                    -
-                  </span>
-                  <input
-                    type="number"
-                    className="form-control count d-inline"
-                    value={quantity}
-                    readOnly
-                  />
-                  <span className="btn plus-btn" onClick={increaseQty}>
-                    +
-                  </span>
-                </div>
-                <button
-                  type="button"
-                  id="cart_btn"
-                  className="btn btn-primary d-inline ml-4"
-                  disabled={product.stock === 0}
-                  onClick={addToCart}
-                >
-                  Add to Cart
-                </button>
-                <hr />
-                <p>
-                  Status:{" "}
-                  <span
-                    id="stock_status"
-                    className={product.stock > 0 ? "greenColor" : "redColor"}
-                  >
-                    {product.stock > 0 ? "In Stock" : "Out of Stock"}
-                  </span>
-                </p>
-                <hr />
-                <h4 className="mt-2">Description:</h4>
-                <span>
-                  <ReadMore text={String(product.description)} />
-                </span>
-                <hr />
-                <p id="product_seller mb-3">
-                  Sold by: <strong>{product.seller}</strong>
-                </p>
-                {user ? (
-                  <button
-                    id="review_btn"
-                    type="button"
-                    className="btn btn-primary mt-4"
-                    data-toggle="modal"
-                    data-target="#ratingModal"
-                    onClick={setUserRatings}
-                  >
-                    Submit Your Review
-                  </button>
-                ) : (
-                  <div className="alert alert-danger mt-5" type="alert">
-                    Login to post your review.
-                  </div>
-                )}
-                <div className="row mt-2 mb-5">
-                  <div className="rating w-50">
-                    <div
-                      className="modal fade"
-                      id="ratingModal"
-                      tabIndex="-1"
-                      role="dialog"
-                      aria-labelledby="ratingModalLabel"
-                      aria-hidden="true"
-                    >
-                      <div className="modal-dialog" role="document">
-                        <div className="modal-content">
-                          <div className="modal-header">
-                            <h5 className="modal-title" id="ratingModalLabel">
-                              Submit Review
-                            </h5>
-                            <button
-                              type="button"
-                              className="close"
-                              data-dismiss="modal"
-                              aria-label="Close"
-                            >
-                              <span aria-hidden="true">&times;</span>
-                            </button>
+            <div className="container-fluid">
+              <div className="row d-flex justify-content-around">
+                <div className="col-12 col-lg-5 img-fluid" id="product_image">
+                  <Carousel pause="hover" interval={null}>
+                    {productImages &&
+                      productImages.map((image) => (
+                        <Carousel.Item key={image.publicid}>
+                          <div className="gallery">
+                            <ImageZoom
+                              className="gallery-img d-block "
+                              src={image.imageName}
+                              alt={product.title}
+                            />
                           </div>
-                          <div className="modal-body">
-                            <ul className="stars">
-                              <li className="star">
-                                <i className="fa fa-star"></i>
-                              </li>
-                              <li className="star">
-                                <i className="fa fa-star"></i>
-                              </li>
-                              <li className="star">
-                                <i className="fa fa-star"></i>
-                              </li>
-                              <li className="star">
-                                <i className="fa fa-star"></i>
-                              </li>
-                              <li className="star">
-                                <i className="fa fa-star"></i>
-                              </li>
-                            </ul>
-                            <textarea
-                              name="review"
-                              id="review"
-                              className="form-control mt-3"
-                              value={comment}
-                              onChange={(e) => setComment(e.target.value)}
-                            ></textarea>
-                            <button
-                              className="btn my-3 float-right review-btn px-4 text-white"
-                              onClick={reviewHandler}
-                              data-dismiss="modal"
-                              aria-label="Close"
-                            >
-                              Submit
-                            </button>
+                        </Carousel.Item>
+                      ))}
+                  </Carousel>
+                </div>
+
+                <div className="col-12 col-lg-6 mt-5">
+                  <div className="social">
+                    <EmailShareButton
+                      url={currentURL}
+                      quote={"フェイスブックはタイトルが付けれるようです"}
+                      hashtag={"#hashtag"}
+                      description={"aiueo"}
+                      className="Demo__some-network__share-button"
+                    >
+                      <EmailIcon size={24} round />
+                      &nbsp;
+                    </EmailShareButton>
+                    <FacebookShareButton
+                      url={currentURL}
+                      quote={"フェイスブックはタイトルが付けれるようです"}
+                      hashtag={"#hashtag"}
+                      description={"aiueo"}
+                      className="Demo__some-network__share-button"
+                    >
+                      <FacebookIcon size={24} round />
+                      &nbsp;
+                    </FacebookShareButton>
+                    <TwitterShareButton
+                      title={"test"}
+                      url={currentURL}
+                      hashtags={["hashtag1", "hashtag2"]}
+                    >
+                      <TwitterIcon size={24} round />
+                      &nbsp;
+                    </TwitterShareButton>
+                    <WhatsappShareButton
+                      url={currentURL}
+                      quote={"フェイスブックはタイトルが付けれるようです"}
+                      hashtag={"#hashtag"}
+                      description={"aiueo"}
+                      className="Demo__some-network__share-button"
+                    >
+                      <WhatsappIcon size={24} round />
+                      &nbsp;
+                    </WhatsappShareButton>
+                    <PinterestShareButton
+                      url={currentURL}
+                      quote={"フェイスブックはタイトルが付けれるようです"}
+                      hashtag={"#hashtag"}
+                      description={"aiueo"}
+                      className="Demo__some-network__share-button"
+                    >
+                      <PinterestIcon size={24} round />
+                      &nbsp;
+                    </PinterestShareButton>
+                  </div>
+                  <br />
+                  <h3>{product.name}</h3>
+                  <p id="productid">Product # {product.id}</p>
+
+                  <hr />
+
+                  <div className="rating-outer">
+                    <div
+                      className="rating-inner"
+                      style={{ width: `${(product.ratings / 5) * 100}%` }}
+                    ></div>
+                  </div>
+                  <span id="no_of_reviews">({product.numOfReviews} Reviews)</span>
+                  <hr />
+                  <p>
+                    {" "}
+                    <span id="product_price">
+                      &#8377;{product.sale_price}{" "}
+                    </span>
+                    <span>
+                      {product.discount > 0 ? (
+                        <span className="text-secondary discount-label">
+                          /-<del>&#8377;{product.original_price}</del>,
+                          <span className="text-success">
+                            {" "}
+                            {product.discount}% off
+                          </span>
+                        </span>
+                      ) : (
+                        ""
+                      )}
+                    </span>
+                  </p>
+                  <div className="stockCounter d-inline">
+                    <span className="btn minus-btn" onClick={decreaseQty}>
+                      -
+                    </span>
+                    <input
+                      type="number"
+                      className="form-control count d-inline"
+                      value={quantity}
+                      readOnly
+                    />
+                    <span className="btn plus-btn" onClick={increaseQty}>
+                      +
+                    </span>
+                  </div>
+                  <button
+                    type="button"
+                    id="cart_btn"
+                    className="btn btn-primary d-inline ml-4"
+                    disabled={product.stock === 0}
+                    onClick={addToCart}
+                  >
+                    Add to Cart
+                  </button>
+                  <hr />
+                  <p>
+                    Status:{" "}
+                    <span
+                      id="stock_status"
+                      className={product.stock > 0 ? "greenColor" : "redColor"}
+                    >
+                      {product.stock > 0 ? "In Stock" : "Out of Stock"}
+                    </span>
+                  </p>
+                  <hr />
+                  <h4 className="mt-2">Description:</h4>
+                  <span>
+                    <ReadMore text={String(product.description)} />
+                  </span>
+                  <hr />
+                  <p id="product_seller mb-3">
+                    Sold by: <strong>{product.seller}</strong>
+                  </p>
+                  {user ? (
+                    <button
+                      id="review_btn"
+                      type="button"
+                      className="btn btn-primary mt-4"
+                      data-toggle="modal"
+                      data-target="#ratingModal"
+                      onClick={setUserRatings}
+                    >
+                      Submit Your Review
+                    </button>
+                  ) : (
+                    <div className="alert alert-danger mt-5" type="alert">
+                      Login to post your review.
+                    </div>
+                  )}
+                  <div className="row mt-2 mb-5">
+                    <div className="rating w-50">
+                      <div
+                        className="modal fade"
+                        id="ratingModal"
+                        tabIndex="-1"
+                        role="dialog"
+                        aria-labelledby="ratingModalLabel"
+                        aria-hidden="true"
+                      >
+                        <div className="modal-dialog" role="document">
+                          <div className="modal-content">
+                            <div className="modal-header">
+                              <h5 className="modal-title" id="ratingModalLabel">
+                                Submit Review
+                              </h5>
+                              <button
+                                type="button"
+                                className="close"
+                                data-dismiss="modal"
+                                aria-label="Close"
+                              >
+                                <span aria-hidden="true">&times;</span>
+                              </button>
+                            </div>
+                            <div className="modal-body">
+                              <ul className="stars">
+                                <li className="star">
+                                  <i className="fa fa-star"></i>
+                                </li>
+                                <li className="star">
+                                  <i className="fa fa-star"></i>
+                                </li>
+                                <li className="star">
+                                  <i className="fa fa-star"></i>
+                                </li>
+                                <li className="star">
+                                  <i className="fa fa-star"></i>
+                                </li>
+                                <li className="star">
+                                  <i className="fa fa-star"></i>
+                                </li>
+                              </ul>
+                              <textarea
+                                name="review"
+                                id="review"
+                                className="form-control mt-3"
+                                value={comment}
+                                onChange={(e) => setComment(e.target.value)}
+                              ></textarea>
+                              <button
+                                className="btn my-3 float-right review-btn px-4 text-white"
+                                onClick={reviewHandler}
+                                data-dismiss="modal"
+                                aria-label="Close"
+                              >
+                                Submit
+                              </button>
+                            </div>
                           </div>
                         </div>
                       </div>
@@ -388,9 +413,8 @@ const ProductDetails = ({ match }) => {
                 </div>
               </div>
             </div>
-            </div>
-            {product.reviews && product.reviews.length > 0 && (
-              <ListReviews reviews={product.reviews} />
+            {reviews && reviews.length > 0 && (
+              <ListReviews reviews={reviews} />
             )}
             <div className="m-3">
               <h3 className="text-muted">Similar products</h3>
@@ -403,7 +427,7 @@ const ProductDetails = ({ match }) => {
                 <Slider {...settings}>
                   {productsRelated &&
                     productsRelated.map((product) => (
-                      <RelatedItem key={product._id} product={product} />
+                      <RelatedItem key={product.id} product={product} RelatedProductImages={RelatedProductImages} />
                     ))}
                 </Slider>
               )}
@@ -411,16 +435,16 @@ const ProductDetails = ({ match }) => {
             </div>
           </div>
           {/* {(products && products.map(product => (
-                  <RelatedItem key={product._id} product={product}  />
+                  <RelatedItem key={product.id} product={product}  />
                 )))} */}
 
           {/* {(productsRelated && productsRelated.map(rProduct => (
-                  <RelatedItem key={rProduct._id} rProduct={rProduct}  />
+                  <RelatedItem key={rProduct.id} rProduct={rProduct}  />
                 )))} */}
 
-          {/* {(productsRelated && <RelatedItem key={productsRelated._id} productsRelated={productsRelated}  />)} */}
+          {/* {(productsRelated && <RelatedItem key={productsRelated.id} productsRelated={productsRelated}  />)} */}
 
-          {/* <RelatedItem key={product._id} product={product} /> */}
+          {/* <RelatedItem key={product.id} product={product} /> */}
         </Fragment>
       )}
     </Fragment>

@@ -39,8 +39,6 @@ const ProductsListAll = ({ history }) => {
                     field: 'id',
                     sort: 'asc',
                     width: 200,
-                    
-
                 },
                 {
                     label: 'Name',
@@ -107,18 +105,18 @@ const ProductsListAll = ({ history }) => {
         }
         products.forEach(product => {
             data.rows.push({
-                id: product._id,
+                id: product.id,
                 Name: product.name,
                 Category: product.category,
                 Stock: product.stock,
-                Price: `${(product.discountPrice)?.toFixed(2)}`,
-                ListPrice: `${(product.price)?.toFixed(2)}`,
+                Price: `${(product.sale_price)}`,
+                ListPrice: `${(product.original_price)}`,
                 Discount: product.discount,
                 Description : product.description,
                 Ratings: product.ratings,
                 NumOfReviews: product.numOfReviews,
                 Seller: product.seller,
-                CreatedAt: product.createdAt,
+                CreatedAt: product.date,
             })
         })
         return data;

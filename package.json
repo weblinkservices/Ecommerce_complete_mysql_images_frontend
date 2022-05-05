@@ -4,7 +4,7 @@
   "description": "",
   "main": "server.js",
   "scripts": {
-    "start": "node backend/server.js",
+    "start": "nodemon backend/server.js",
     "dev": "SET NODE_ENV=DEVELOPMENT& nodemon backend/server",
     "prod": "SET NODE_ENV=PRODUCTION& nodemon backend/server",
     "seeder": "node backend/utils/seeder.js",
@@ -18,10 +18,13 @@
     "cloudinary": "^1.27.1",
     "cookie-parser": "^1.4.6",
     "dotenv": "^10.0.0",
+    "email-validator": "^2.0.4",
     "express": "^4.17.2",
     "express-fileupload": "^1.2.1",
     "jsonwebtoken": "^8.5.1",
-    "mongoose": "^6.1.2",
+    "mongoose": "^6.1.6",
+    "multer": "^1.4.4",
+    "mysql2": "^2.3.3",
     "nodemailer": "^6.7.2",
     "validator": "^13.7.0"
   },

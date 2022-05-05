@@ -1,8 +1,11 @@
 const app = require('./app');
 const connectDatabase = require('./config/database')
+const connection = require('./config/connection');
 const cloudinary = require('cloudinary');
 
 const dotenv = require('dotenv');
+
+
 
 //Handle Uncaught exception
 process.on('uncaughtException', err=>{
@@ -18,14 +21,17 @@ dotenv.config({path:'backend/config/config.env'})
 if(process.env.NODE_ENV !== 'PRODUCTION') require('dotenv').config({path:'backend/config/config.env'}) 
 
 //Connecting to database
-connectDatabase();
-
-//Setting up cloudinary configuration 
-cloudinary.config({
-  cloud_name : process.env.CLOUDNARY_CLOUD_NAME,
-  api_key : process.env.CLOUDNARY_API_KEY,
-  api_secret : process.env.CLOUDNARY_API_SECRET,
+// connectDatabase();
+connection.connect((error) => {
+    if (error) throw error;
+    if (!error) {
+        console.log("Database is connected successfully...!");
+    } else {
+        console.log("Database connection failed :", error.message);
+    }
 })
+
+
 
 const server = app.listen(process.env.PORT, ()=>{
     console.log(`Server started on PORT: ${process.env.PORT} in ${process.env.NODE_ENV} mode.`);

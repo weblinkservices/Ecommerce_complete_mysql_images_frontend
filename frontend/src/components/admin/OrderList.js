@@ -17,6 +17,7 @@ const OrdersList = ({ history }) => {
     const dispatch = useDispatch();
 
     const { loading, error, orders } = useSelector(state => state.allOrders);
+    console.log("orders45",orders);
     const { isDeleted } = useSelector(state => state.order)
 
     useEffect(() => {
@@ -72,17 +73,17 @@ const OrdersList = ({ history }) => {
 
         orders.forEach(order => {
             data.rows.push({
-                id: order._id,
-                numofItems: order.orderItems.length,
+                id: order.id,
+                numofItems: order.quantity,
                 amount: `₹${order.totalPrice}`,
                 status: order.orderStatus && String(order.orderStatus).includes('Delivered')
                     ? <p style={{ color: 'green' }}>{order.orderStatus}</p>
                     : <p style={{ color: 'red' }}>{order.orderStatus}</p>,
                 actions: <Fragment>
-                    <Link to={`/admin/order/${order._id}`} className="btn btn-primary py-1 px-2">
+                    <Link to={`/admin/order/${order.id}`} className="btn btn-primary py-1 px-2">
                         <i className="fa fa-eye"></i>
                     </Link>
-                    <button className="btn btn-danger py-1 px-2 ml-2" onClick={() => deleteOrderHandler(order._id)}>
+                    <button className="btn btn-danger py-1 px-2 ml-2" onClick={() => deleteOrderHandler(order.id)}>
                         <i className="fa fa-trash"></i>
                     </button>
                 </Fragment>
@@ -91,7 +92,6 @@ const OrdersList = ({ history }) => {
 
         return data;
     }
-
 
     return (
         <Fragment>

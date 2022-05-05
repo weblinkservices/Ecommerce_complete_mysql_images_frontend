@@ -12,6 +12,7 @@ const UpdateProfile = ({ history }) => {
     const [name, setName] = useState('')
     const [email, setEmail] = useState('')
     const [avatar, setAvatar] = useState('')
+    const [file, setFile] = useState()
     const [avatarPreview, setAvatarPreview] = useState('/images/default_avatar.jpg')
 
     const alert = useAlert();
@@ -24,7 +25,7 @@ const UpdateProfile = ({ history }) => {
         if (user) {
             setName(user.name);
             setEmail(user.email);
-            setAvatarPreview(user.avatar.url)
+            setAvatarPreview(user.imageName)
         }
         if (error) {
             alert.error(error);
@@ -38,7 +39,7 @@ const UpdateProfile = ({ history }) => {
                 type: UPDATE_PROFILE_RESET
             })
         }
-    }, [dispatch, alert, error, history, isUpdated,user])
+    }, [dispatch, alert, error, history, isUpdated, user])
 
     const submitHandler = (e) => {
         e.preventDefault();
@@ -46,20 +47,24 @@ const UpdateProfile = ({ history }) => {
         const formData = new FormData();
         formData.set('name', name);
         formData.set('email', email);
-        formData.set('avatar', avatar);
+        for (let i = 0; i < file.length; i++) {
+            formData.append(`file`, file[i])
+          }
 
-        var object = {};
-        formData.forEach((value, key) => object[key] = value);
-        var json = object
-console.log(json)
+        // var object = {};
+        // formData.forEach((value, key) => object[key] = value);
+        // var json = object
+        // console.log(json)
 
         // dispatch(updateProfile(formData))
-        dispatch(updateProfile(json))
+        dispatch(updateProfile(formData))
     }
 
-    const onChange = e => {
-        const reader = new FileReader();
+    const onChange = event => {
+        const file = event.target.files;
+        setFile(file);
 
+        const reader = new FileReader();
         reader.onload = () => {
             if (reader.readyState === 2) {
                 setAvatarPreview(reader.result)
@@ -67,7 +72,7 @@ console.log(json)
             }
         }
 
-        reader.readAsDataURL(e.target.files[0])
+        reader.readAsDataURL(event.target.files[0])
 
     }
     return (
@@ -118,7 +123,7 @@ console.log(json)
                                 <div className='custom-file'>
                                     <input
                                         type='file'
-                                        name='avatar'
+                                        name='file'
                                         className='custom-file-input'
                                         id='customFile'
                                         accept='image/*'

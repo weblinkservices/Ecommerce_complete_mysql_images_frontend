@@ -30,7 +30,6 @@ export const cartReducer = (state ={cartItems:[], shippingInfo:{}}, action)=>{
                 shippingInfo: action.payload
             } 
 
-
         default:
             return state
     }

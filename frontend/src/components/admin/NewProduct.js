@@ -2,7 +2,6 @@ import React, { Fragment, useState, useEffect } from "react";
 
 import MetaData from "../layout/MetaData";
 import Sidebar from "./Sidebar";
-
 import { useAlert } from "react-alert";
 import { useDispatch, useSelector } from "react-redux";
 import { newProduct, clearErrors, getDiscount } from "../../actions/productActions";
@@ -10,15 +9,16 @@ import { NEW_PRODUCT_RESET } from "../../constants/productConstants";
 
 const NewProduct = ({ history }) => {
   const [name, setName] = useState("");
-  const [price, setPrice] = useState(0);
+  const [original_price, setOriginal_price] = useState(0);
   const [discount, setDiscount] = useState(0);
-  const [discountPrice, setDiscountPrice] = useState(0);
+  const [sale_price, setSale_price] = useState(0);
   const [description, setDescription] = useState("");
   const [category, setCategory] = useState("");
   const [stock, setStock] = useState(0);
   const [seller, setSeller] = useState("");
   const [images, setImages] = useState([]);
   const [imagesPreview, setImagesPreview] = useState([])
+  const [file, setFile] = useState();
 
   const categories = [
     "Electronics",
@@ -37,7 +37,6 @@ const NewProduct = ({ history }) => {
 
   const alert = useAlert();
   const dispatch = useDispatch();
-
   const { loading, error, success } = useSelector((state) => state.newProduct);
 
   useEffect(() => {
@@ -56,28 +55,33 @@ const NewProduct = ({ history }) => {
   const submitHandler = (e) => {
     e.preventDefault();
 
-    
-
     const formData = new FormData();
     formData.set("name", name);
-    formData.set("price", price);
+    formData.set("original_price", original_price);
     formData.set("discount", discount);
-    formData.set("discountPrice", getDiscount(price, discount));
+    formData.set("sale_price", getDiscount(original_price, discount));
     formData.set("description", description);
     formData.set("category", category);
     formData.set("stock", stock);
     formData.set("seller", seller);
+    // formData.append("file", file);
 
-    images.forEach((image) => {
-      formData.append("images", image);
-    });
+    // images.forEach((image) => {
+    //   formData.append("images", image);
+    // });
+
+    for (let i = 0; i < file.length; i++) {
+      formData.append(`file`, file[i])
+    }
 
     dispatch(newProduct(formData));
   };
 
-  const onChange = (e) => {
-    const files = Array.from(e.target.files)
+  const onChange = (event) => {
+    const file = event.target.files;
+    setFile(file)
 
+    const files = Array.from(event.target.files)
     setImagesPreview([]);
     setImages([])
 
@@ -89,7 +93,6 @@ const NewProduct = ({ history }) => {
           setImages((oldArray) => [...oldArray, reader.result]);
         }
       };
-
       reader.readAsDataURL(file);
     });
   };
@@ -100,14 +103,13 @@ const NewProduct = ({ history }) => {
         <div className="col-12 col-md-2">
           <Sidebar />
         </div>
-
         <div className="col-12 col-md-10">
           <Fragment>
             <div className="wrapper my-5">
               <form
                 className="shadow-lg"
                 onSubmit={submitHandler}
-                encType="multipart/form-data"
+                enctype="multipart/form-data"
               >
                 <h1 className="mb-4">New Product</h1>
 
@@ -127,10 +129,10 @@ const NewProduct = ({ history }) => {
                   <input
                     type="number"
                     id="price_field"
-                    onWheel={ event => event.currentTarget.blur() }
+                    onWheel={event => event.currentTarget.blur()}
                     className="form-control"
-                    value={price}
-                    onChange={(e) => setPrice(e.target.value)}
+                    value={original_price}
+                    onChange={(e) => setOriginal_price(e.target.value)}
                   />
                 </div>
 
@@ -138,26 +140,24 @@ const NewProduct = ({ history }) => {
                   <label htmlFor="discount_field">Discount in Percentage (%)</label>
                   <input
                     type="number"
-                    onWheel={ event => event.currentTarget.blur() }
+                    onWheel={event => event.currentTarget.blur()}
                     id="discount_field"
                     className="form-control"
                     value={discount}
-                    onChange={(e) => setDiscount(e.target.value) }
-                     
+                    onChange={(e) => setDiscount(e.target.value)}
                   />
                 </div>
 
                 <div className="form-group">
-                  <label htmlFor="discountPrice_field">Discount Price</label>
+                  <label htmlFor="sale_price_field">Discount Price</label>
                   <input
                     type="number"
-                    onWheel={ event => event.currentTarget.blur() }
-                    id="discountPrice_field"
+                    onWheel={event => event.currentTarget.blur()}
+                    id="sale_price_field"
                     className="form-control"
-                    value={getDiscount(price, discount)}
-                    onChange={(e) => setDiscountPrice(e.target.value) }
-                     
-                  readOnly/>
+                    value={getDiscount(original_price, discount)}
+                    onChange={(e) => setSale_price(e.target.value)}
+                    readOnly />
                 </div>
 
                 <div className="form-group">
@@ -190,7 +190,7 @@ const NewProduct = ({ history }) => {
                   <label htmlFor="stock_field">Stock</label>
                   <input
                     type="number"
-                    onWheel={ event => event.currentTarget.blur() }
+                    onWheel={event => event.currentTarget.blur()}
                     id="stock_field"
                     className="form-control"
                     value={stock}
@@ -215,7 +215,7 @@ const NewProduct = ({ history }) => {
                   <div className="custom-file">
                     <input
                       type="file"
-                      name="product_images"
+                      name="file"
                       className="custom-file-input"
                       id="customFile"
                       onChange={onChange}
@@ -227,8 +227,8 @@ const NewProduct = ({ history }) => {
                   </div>
 
                   {imagesPreview.map(img => (
-                                        <img src={img} key={img} alt="Images Preview" className="mt-3 mr-2" width="55" height="52" />
-                                    ))}
+                    <img src={img} key={img} alt="Images Preview" className="mt-3 mr-2" width="55" height="52" />
+                  ))}
                 </div>
 
                 <button

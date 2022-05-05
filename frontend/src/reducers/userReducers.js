@@ -124,7 +124,8 @@ export const userReducer = (state = {}, action) => {
             return {
                 ...state,
                 loading: false,
-                isUpdated: action.payload
+                isUpdated: action.payload,
+                success: action.payload.success,
             }
 
         case DELETE_USER_SUCCESS:

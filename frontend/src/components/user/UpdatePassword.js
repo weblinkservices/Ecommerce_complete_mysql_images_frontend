@@ -17,7 +17,6 @@ const UpdatePassword = ({history}) => {
     const { error, isUpdated, loading } = useSelector(state => state.user)
 
     useEffect(() => {
-
         if (error) {
             alert.error(error);
             dispatch(clearErrors());
@@ -25,9 +24,7 @@ const UpdatePassword = ({history}) => {
 
         if (isUpdated) {
             alert.success('User updated successfully')
-
             history.push('/me')
-
             dispatch({
                 type: UPDATE_PASSWORD_RESET
             })
@@ -41,10 +38,7 @@ const UpdatePassword = ({history}) => {
         const formData = new FormData();
         formData.set('oldPassword', oldPassword);
         formData.set('password', password);
-      
         dispatch(updatePassword(formData))
-
-      
     
     }
 

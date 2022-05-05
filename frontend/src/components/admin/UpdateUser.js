@@ -1,54 +1,43 @@
 import React, { Fragment, useState, useEffect } from 'react'
-
 import MetaData from '../layout/MetaData'
 import Sidebar from './Sidebar'
-
 import { useAlert } from 'react-alert'
 import { useDispatch, useSelector } from 'react-redux'
 import { updateUser, getUserDetails, clearErrors } from '../../actions/userActions'
 import { UPDATE_USER_RESET } from '../../constants/userConstants'
 
 const UpdateUser = ({ history, match }) => {
-
     const [name, setName] = useState('')
     const [email, setEmail] = useState('')
     const [role, setRole] = useState('')
-
     const alert = useAlert();
     const dispatch = useDispatch();
-
-    const { error, isUpdated } = useSelector(state => state.user);
+    const { error, isUpdated, success } = useSelector(state => state.user);
     const { user } = useSelector(state => state.userDetails)
-
     const userId = match.params.id;
 
     useEffect(() => {
-
-        console.log(user && user._id !== userId);
-        if (user && user._id !== userId) {
+        if (user && user.id !== userId) {
             dispatch(getUserDetails(userId))
-        } else {
+        } 
             setName(user.name);
             setEmail(user.email);
             setRole(user.role)
-        }
 
         if (error) {
             alert.error(error);
             dispatch(clearErrors());
         }
 
-        if (isUpdated) {
+        if (success || isUpdated) {
             alert.success('User updated successfully')
-
             history.push('/admin/users')
-
             dispatch({
                 type: UPDATE_USER_RESET
             })
         }
 
-    }, [dispatch, alert, error, history, isUpdated, userId, user])
+    }, [dispatch, userId, user.id, success, history, isUpdated, error])
 
     const submitHandler = (e) => {
         e.preventDefault();
@@ -58,9 +47,13 @@ const UpdateUser = ({ history, match }) => {
         formData.set('email', email);
         formData.set('role', role);
 
-        dispatch(updateUser(user._id, formData))
-    }
+        var object = {};
+        formData.forEach((value, key) => object[key] = value);
+        var json = object
+        // console.log(json)
 
+        dispatch(updateUser(user.id, json))
+    }
 
     return (
         <Fragment>

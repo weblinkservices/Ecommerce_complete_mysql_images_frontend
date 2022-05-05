@@ -78,7 +78,6 @@ export const getOrderDetails = (id)=> async(dispatch)=>{
             type:ORDER_DETAILS_SUCCESS,
             payload:data.order
         })
-        
     } catch (error) {
         dispatch({
             type:ORDER_DETAILS_FAIL,

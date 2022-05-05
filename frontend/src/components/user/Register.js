@@ -1,13 +1,10 @@
 import React, { Fragment, useState, useEffect } from 'react'
-
 import MetaData from '../layout/MetaData'
-
 import { useAlert } from 'react-alert'
 import { useDispatch, useSelector } from 'react-redux'
 import { register, clearErrors } from '../../actions/userActions'
 
 const Register = ({ history }) => {
-
     const [user, setUser] = useState({
         name: '',
         email: '',
@@ -15,26 +12,21 @@ const Register = ({ history }) => {
     })
 
     const { name, email, password } = user;
-
-    const [avatar, setAvatar] = useState('')
+    const [avatar, setAvatar] = useState()
+    const [file, setFile] = useState()
     const [avatarPreview, setAvatarPreview] = useState('/images/default_avatar.jpg')
-
     const alert = useAlert();
     const dispatch = useDispatch();
-
     const { isAuthenticated, error, loading } = useSelector(state => state.auth);
 
     useEffect(() => {
-
         if (isAuthenticated) {
             history.push('/')
         }
-
         if (error) {
             alert.error(error);
             dispatch(clearErrors());
         }
-
     }, [dispatch, alert, isAuthenticated, error, history])
 
     const submitHandler = (e) => {
@@ -44,46 +36,47 @@ const Register = ({ history }) => {
         formData.set('name', name);
         formData.set('email', email);
         formData.set('password', password);
-        formData.set('avatar', avatar);
+        for (let i = 0; i < file.length; i++) {
+            formData.append(`file`, file[i])
+          }
 
-        var object = {};
-        formData.forEach((value, key) => object[key] = value);
-        var json = object
-        console.log(json)
+        // var object = {};
+        // formData.forEach((value, key) => object[key] = value);
+        // var json = object;
+        // console.log(json);
 
-        // dispatch(register(formData))
-        dispatch(register(json))
+        console.log("name",name);
+        console.log("name",email);
+        console.log("name",password);
+        console.log("name",file);
+
+        dispatch(register(formData))
     }
 
-    const onChange = e => {
-        if (e.target.name === 'avatar') {
+    const onChange = event => {
+        const file = event.target.files;
+        setFile(file);
 
+        if (event.target.name === 'file') {
             const reader = new FileReader();
-
             reader.onload = () => {
                 if (reader.readyState === 2) {
                     setAvatarPreview(reader.result)
                     setAvatar(reader.result)
                 }
             }
-
-            reader.readAsDataURL(e.target.files[0])
-
+            reader.readAsDataURL(event.target.files[0])
         } else {
-            setUser({ ...user, [e.target.name]: e.target.value })
+            setUser({ ...user, [event.target.name]: event.target.value })
         }
     }
-
     return (
         <Fragment>
-
             <MetaData title={'Register User'} />
-
             <div className="row wrapper">
                 <div className="col-10 col-lg-5">
                     <form className="shadow-lg" onSubmit={submitHandler} encType='multipart/form-data'>
                         <h1 className="mb-3">Register</h1>
-
                         <div className="form-group">
                             <label htmlFor="email_field">Name</label>
                             <input
@@ -95,7 +88,6 @@ const Register = ({ history }) => {
                                 onChange={onChange}
                             />
                         </div>
-
                         <div className="form-group">
                             <label htmlFor="email_field">Email</label>
                             <input
@@ -107,7 +99,6 @@ const Register = ({ history }) => {
                                 onChange={onChange}
                             />
                         </div>
-
                         <div className="form-group">
                             <label htmlFor="password_field">Password</label>
                             <input
@@ -119,7 +110,6 @@ const Register = ({ history }) => {
                                 onChange={onChange}
                             />
                         </div>
-
                         <div className='form-group'>
                             <label htmlFor='avatar_upload'>Avatar</label>
                             <div className='d-flex align-items-center'>
@@ -135,10 +125,10 @@ const Register = ({ history }) => {
                                 <div className='custom-file'>
                                     <input
                                         type='file'
-                                        name='avatar'
+                                        name='file'
                                         className='custom-file-input'
                                         id='customFile'
-                                        accept="iamges/*"
+                                        accept="image/*"
                                         onChange={onChange}
                                     />
                                     <label className='custom-file-label' htmlFor='customFile'>
@@ -147,7 +137,6 @@ const Register = ({ history }) => {
                                 </div>
                             </div>
                         </div>
-
                         <button
                             id="register_button"
                             type="submit"
@@ -159,7 +148,6 @@ const Register = ({ history }) => {
                     </form>
                 </div>
             </div>
-
         </Fragment>
     )
 }

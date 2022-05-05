@@ -77,15 +77,15 @@ const ProductsList = ({ history }) => {
         products.forEach(product => {
             if(product.stock === 0){
             data.rows.push({
-                id: product._id,
+                id: product.id,
                 name: product.name,
-                price: `₹${(product.discountPrice)?.toFixed(2)}`,
+                price: `₹${(product.sale_price)?.toFixed(2)}`,
                 stock: product.stock,
                 actions: <Fragment>
-                    <Link to={`/admin/product/${product._id}`} className="btn btn-primary py-1 px-2">
+                    <Link to={`/admin/product/${product.id}`} className="btn btn-primary py-1 px-2">
                         <i className="fa fa-pencil"></i>
                     </Link>
-                    <button className="btn btn-danger py-1 px-2 ml-2" onClick={() => deleteProductHandler(product._id)}>
+                    <button className="btn btn-danger py-1 px-2 ml-2" onClick={() => deleteProductHandler(product.id)}>
                         <i className="fa fa-trash"></i>
                     </button>
                 </Fragment>

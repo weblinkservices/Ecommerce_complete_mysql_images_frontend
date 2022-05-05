@@ -11,8 +11,10 @@ const ConfirmOrder = ({ history }) => {
     const { cartItems, shippingInfo } = useSelector(state => state.cart)
     const { user } = useSelector(state => state.auth)
 
+    console.log("cartItems",cartItems);
+
     // Calculate Order Prices
-    const itemsPrice = cartItems.reduce((acc, item) => acc + item.price * item.quantity, 0)
+    const itemsPrice = cartItems.reduce((acc, item) => acc + item.sale_price * item.quantity, 0)
     const shippingPrice = itemsPrice > 500 ? 0 : 25
     const taxPrice = Number((0.05 * itemsPrice).toFixed(2))
     const totalPrice = (itemsPrice + shippingPrice + taxPrice).toFixed(2)
@@ -43,7 +45,6 @@ const ConfirmOrder = ({ history }) => {
                     <p><b>Name:</b> {user && user.name}</p>
                     <p><b>Phone:</b> {shippingInfo.phoneNo}</p>
                     <p className="mb-4"><b>Address:</b> {`${shippingInfo.address}, ${shippingInfo.city}, ${shippingInfo.postalCode}, ${shippingInfo.country}`}</p>
-
                     <hr />
                     <h4 className="mt-4">Your Cart Items:</h4>
 
@@ -60,21 +61,15 @@ const ConfirmOrder = ({ history }) => {
                                         <Link to={`/product/${item.product}`}>{item.name}</Link>
                                     </div>
 
-
                                     <div className="col-4 col-lg-4 mt-4 mt-lg-0">
-                                        <p>{item.quantity} x &#8377;{item.price} = <b>&#8377;{(item.quantity * item.price).toFixed(2)}</b></p>
+                                        <p>{item.quantity} x &#8377;{item.sale_price} = <b>&#8377;{(item.quantity * item.sale_price).toFixed(2)}</b></p>
                                     </div>
-
                                 </div>
                             </div>
                             <hr />
                         </Fragment>
                     ))}
-
-
-
                 </div>
-
                 <div className="col-12 col-lg-3 my-4">
                     <div id="order_summary">
                         <h4>Order Summary</h4>
@@ -82,7 +77,6 @@ const ConfirmOrder = ({ history }) => {
                         <p>Subtotal:  <span className="order-summary-values">&#8377;{itemsPrice}</span></p>
                         <p>Shipping: <span className="order-summary-values">&#8377;{shippingPrice}</span></p>
                         <p>Tax:  <span className="order-summary-values">&#8377;{taxPrice}</span></p>
-
                         <hr />
 
                         <p>Total: <span className="order-summary-values">&#8377;{totalPrice}</span></p>
@@ -91,10 +85,7 @@ const ConfirmOrder = ({ history }) => {
                         <button id="checkout_btn" className="btn btn-primary btn-block" onClick={processToPayment}>Proceed to Payment</button>
                     </div>
                 </div>
-
-
             </div>
-
         </Fragment>
     )
 }

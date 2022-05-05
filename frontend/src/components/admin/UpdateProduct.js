@@ -9,17 +9,16 @@ import { updateProduct, getProductDetails, clearErrors, getDiscount } from '../.
 import { UPDATE_PRODUCT_RESET } from '../../constants/productConstants'
 
 const UpdateProduct = ({ match, history }) => {
-    
-
     const [name, setName] = useState('');
-    const [price, setPrice] = useState(0);
+    const [original_price, setOriginal_price] = useState(0);
     const [discount, setDiscount] = useState(0);
-    const [discountPrice, setDiscountPrice] = useState(0);
+    const [sale_price, setSale_price] = useState(0);
     const [description, setDescription] = useState('');
     const [category, setCategory] = useState('');
-    const [stock, setStock] = useState(0);
+    const [stock, setStock] = useState(0); 
     const [seller, setSeller] = useState('');
     const [images, setImages] = useState([]);
+    const [file, setFile] = useState();
 
     const [oldImages, setOldImages] = useState([]);
     const [imagesPreview, setImagesPreview] = useState([])
@@ -42,27 +41,29 @@ const UpdateProduct = ({ match, history }) => {
     const alert = useAlert();
     const dispatch = useDispatch();
 
-    const { error, product } = useSelector(state => state.productDetails)
-    const { loading, error: updateError, isUpdated } = useSelector(state => state.product);
-
-  
-
+    const { error, product, productImages } = useSelector(state => state.productDetails)
+    const { loading, error: updateError, isUpdated, success } = useSelector(state => state.product);
     const productId = match.params.id;
 
     useEffect(() => {
-
-        if (product && product._id !== productId) {
+        if (product && product.id !== productId) {
             dispatch(getProductDetails(productId));
-        } else {
+        } 
             setName(product.name);
-            setPrice(product.price);
+            setOriginal_price(product.original_price);
             setDiscount(product.discount);
-            setDiscountPrice(product.discountPrice);
+            setSale_price(product.sale_price);
             setDescription(product.description);
             setCategory(product.category);
             setSeller(product.seller);
-            setStock(product.stock)
-            setOldImages(product.images)
+            setStock(product.stock);
+            setOldImages(productImages)
+      
+           
+        if (success || isUpdated) {
+            history.push("/admin/products");
+            alert.success("Product updated successfully");
+            dispatch({ type: UPDATE_PRODUCT_RESET })
         }
 
         if (error) {
@@ -74,15 +75,7 @@ const UpdateProduct = ({ match, history }) => {
             alert.error(updateError);
             dispatch(clearErrors())
         }
-
-
-        if (isUpdated) {
-            history.push('/admin/products');
-            alert.success('Product updated successfully');
-            dispatch({ type: UPDATE_PRODUCT_RESET })
-        }
-
-    }, [dispatch, alert, error, isUpdated, history, updateError, product, productId])
+    },[dispatch, alert, error, isUpdated, success, history, product.id, updateError,productId])
 
 
     const submitHandler = (e) => {
@@ -90,43 +83,46 @@ const UpdateProduct = ({ match, history }) => {
 
         const formData = new FormData();
         formData.set('name', name);
-        formData.set('price', price);
+        formData.set('original_price', original_price);
         formData.set('discount', discount);
-        formData.set('discountPrice', getDiscount(price, discount));
+        formData.set('sale_price', getDiscount(original_price, discount));
         formData.set('description', description);
         formData.set('category', category);
         formData.set('stock', stock);
         formData.set('seller', seller);
 
-        images.forEach(image => {
-            formData.append('images', image)
-        })
+        // images.forEach(image => {
+        //     formData.append('images', image)
+        // })
+        if(file){
+        for (let i = 0; i < file.length; i++) {
+                formData.append(`file`, file[i])
+            }
+        }
 
-        dispatch(updateProduct(product._id, formData))
+        dispatch(updateProduct(product.id, formData))
     }
 
-    const onChange = e => {
+    const onChange = event => {
+        const file = event.target.files;
+        setFile(file)
 
-        const files = Array.from(e.target.files)
-
+        const files = Array.from(event.target.files)
         setImagesPreview([]);
         setImages([])
         setOldImages([])
 
         files.forEach(file => {
             const reader = new FileReader();
-
             reader.onload = () => {
                 if (reader.readyState === 2) {
                     setImagesPreview(oldArray => [...oldArray, reader.result])
                     setImages(oldArray => [...oldArray, reader.result])
                 }
             }
-
             reader.readAsDataURL(file)
         })
     }
-
 
     return (
         <Fragment>
@@ -135,7 +131,6 @@ const UpdateProduct = ({ match, history }) => {
                 <div className="col-12 col-md-2">
                     <Sidebar />
                 </div>
-
                 <div className="col-12 col-md-10">
                     <Fragment>
                         <div className="wrapper my-5">
@@ -158,10 +153,10 @@ const UpdateProduct = ({ match, history }) => {
                                     <input
                                         type="number"
                                         id="price_field"
-                                        onWheel={ event => event.currentTarget.blur() }
+                                        onWheel={event => event.currentTarget.blur()}
                                         className="form-control"
-                                        value={price}
-                                        onChange={(e) => setPrice(e.target.value)}
+                                        value={original_price}
+                                        onChange={(e) => setOriginal_price(e.target.value)}
                                     />
                                 </div>
 
@@ -170,7 +165,7 @@ const UpdateProduct = ({ match, history }) => {
                                     <input
                                         type="number"
                                         id="discount_field"
-                                        onWheel={ event => event.currentTarget.blur() }
+                                        onWheel={event => event.currentTarget.blur()}
                                         className="form-control"
                                         value={discount}
                                         onChange={(e) => setDiscount(e.target.value)}
@@ -182,11 +177,11 @@ const UpdateProduct = ({ match, history }) => {
                                     <input
                                         type="number"
                                         id="discountPrice_field"
-                                        onWheel={ event => event.currentTarget.blur() }
+                                        onWheel={event => event.currentTarget.blur()}
                                         className="form-control"
-                                        value={getDiscount(price, discount)}
-                                        onChange={(e) => setDiscountPrice(e.target.value)}
-                                    readOnly/>
+                                        value={sale_price}
+                                        onChange={(e) => setSale_price(e.target.value)}
+                                        readOnly />
                                 </div>
 
                                 <div className="form-group">
@@ -208,7 +203,7 @@ const UpdateProduct = ({ match, history }) => {
                                     <input
                                         type="number"
                                         id="stock_field"
-                                        onWheel={ event => event.currentTarget.blur() }
+                                        onWheel={event => event.currentTarget.blur()}
                                         className="form-control"
                                         value={stock}
                                         onChange={(e) => setStock(e.target.value)}
@@ -228,11 +223,10 @@ const UpdateProduct = ({ match, history }) => {
 
                                 <div className='form-group'>
                                     <label>Images</label>
-
                                     <div className='custom-file'>
                                         <input
                                             type='file'
-                                            name='product_images'
+                                            name='file'
                                             className='custom-file-input'
                                             id='customFile'
                                             onChange={onChange}
@@ -240,11 +234,11 @@ const UpdateProduct = ({ match, history }) => {
                                         />
                                         <label className='custom-file-label' htmlFor='customFile'>
                                             Choose Images
-                                 </label>
+                                        </label>
                                     </div>
 
                                     {oldImages && oldImages.map(img => (
-                                        <img key={img} src={img.url} alt={img.url} className="mt-3 mr-2" width="55" height="52" />
+                                        <img key={img} src={img.imageName} alt={img.imageName} className="mt-3 mr-2" width="55" height="52" />
                                     ))}
 
                                     {imagesPreview.map(img => (
@@ -253,7 +247,6 @@ const UpdateProduct = ({ match, history }) => {
 
                                 </div>
 
-
                                 <button
                                     id="login_button"
                                     type="submit"
@@ -261,7 +254,7 @@ const UpdateProduct = ({ match, history }) => {
                                     disabled={loading ? true : false}
                                 >
                                     UPDATE PRODUCT
-                            </button>
+                                </button>
 
                             </form>
                         </div>

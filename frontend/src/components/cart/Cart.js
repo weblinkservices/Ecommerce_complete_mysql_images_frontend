@@ -43,7 +43,7 @@ const Cart = ({ history }) => {
                                                 <Link to={`/products/${item.product}`}>{item.name}</Link>
                                             </div>
                                             <div className="col-4 col-lg-2 mt-4 mt-lg-0">
-                                                <p id="card_item_price">&#8377;{(item.discountPrice)?.toFixed(2)}</p>
+                                                <p id="card_item_price">&#8377;{item.sale_price}</p>
                                             </div>
                                             <div className="col-4 col-lg-3 mt-4 mt-lg-0">
                                                 <div className="stockCounter d-inline">
@@ -66,7 +66,7 @@ const Cart = ({ history }) => {
                                 <h4>Order Summary</h4>
                                 <hr />
                                 <p>Subtotal:  <span className="order-summary-values">{cartItems.reduce((acc, item) => (acc + Number(item.quantity)), 0)} (Units)</span></p>
-                                <p>Est. total: <span className="order-summary-values">&#8377;{cartItems.reduce((acc, item) => acc + item.quantity * item.discountPrice, 0).toFixed(2)}</span></p>
+                                <p>Est. total: <span className="order-summary-values">&#8377;{cartItems.reduce((acc, item) => acc + item.quantity * item.sale_price, 0).toFixed(2)}</span></p>
                                 <hr />
                                 <button id="checkout_btn" className="btn btn-primary btn-block" onClick={checkoutHandler}>Check out</button>
                             </div>

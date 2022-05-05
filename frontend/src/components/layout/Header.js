@@ -19,8 +19,7 @@ const Header = () => {
     dispatch(logout());
     alert.success('Logged out successfully.')
   }
-
-
+  
   return (
     <Fragment>
       <nav className="navbar row">
@@ -48,7 +47,7 @@ const Header = () => {
               aria-haspopup="true" aria-expanded="false">
 
                 <figure className="avatar avatar-nav">
-                  <img src={user.avatar && user.avatar.url} alt={user && user.name}
+                  <img src={user && user.imageName} alt={user && user.name}
                   className="rounded-circle" />
                 </figure>
 
@@ -64,12 +63,9 @@ const Header = () => {
                 <Link className="dropdown-item" to="/me">Profile</Link>
                 <Link className="dropdown-item text-danger" to="/"  onClick={logoutHandler}>Logout</Link>
               </div>
-
             </div>
 
-
           ): !loading && <Link to="/login" className="btn ml-4" id="login_btn">Login</Link> }
-
 
         </div>
       </nav>

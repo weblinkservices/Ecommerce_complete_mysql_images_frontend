@@ -39,9 +39,6 @@ const ProductReviews = () => {
             alert.success('Review deleted successfully');
             dispatch({ type: DELETE_REVIEW_RESET })
         }
-
-
-
     }, [dispatch, alert, error, productId, isDeleted, deleteError])
 
     const deleteReviewHandler = (id) => {
@@ -86,13 +83,13 @@ const ProductReviews = () => {
 
         reviews.forEach(review => {
             data.rows.push({
-                id: review._id,
+                id: review.id,
                 rating: review.rating,
-                comment: review.comment,
+                comment: review.comments,
                 user: review.name,
 
                 actions:
-                    <button className="btn btn-danger py-1 px-2 ml-2" onClick={() => deleteReviewHandler(review._id)}>
+                    <button className="btn btn-danger py-1 px-2 ml-2" onClick={() => deleteReviewHandler(review.id)}>
                         <i className="fa fa-trash"></i>
                     </button>
             })
@@ -131,10 +128,9 @@ const ProductReviews = () => {
                                         className="btn btn-primary btn-block py-2"
                                     >
                                         SEARCH
-								    </button>
+                                    </button>
                                 </ form>
                             </div>
-
                         </div>
 
                         {reviews && reviews.length > 0 ? (
@@ -146,14 +142,11 @@ const ProductReviews = () => {
                                 hover
                             />
                         ) : (
-                                <p className="mt-5 text-center">No Reviews.</p>
-                            )}
-
-
+                            <p className="mt-5 text-center">No Reviews.</p>
+                        )}
                     </Fragment>
                 </div>
             </div>
-
         </Fragment>
     )
 }

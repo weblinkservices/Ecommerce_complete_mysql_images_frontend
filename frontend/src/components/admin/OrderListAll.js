@@ -17,6 +17,8 @@ const OrdersListAll = ({ history }) => {
     const { loading, error, orders } = useSelector(state => state.allOrders);
     const { isDeleted } = useSelector(state => state.order)
 
+    console.log("orders1",orders);
+
     useEffect(() => {
         dispatch(allOrders());
 
@@ -98,7 +100,7 @@ const OrdersListAll = ({ history }) => {
 
                 },
                 {
-                    label: 'shippingInfo',
+                    label: 'shipping_info',
                     field: 'Shipping_Info',
                     sort: 'asc',
                     width: 600
@@ -125,25 +127,26 @@ const OrdersListAll = ({ history }) => {
             rows: []
         }
 
+        if(orders){
         orders.forEach(order => {
             data.rows.push({
-                id: order._id,
-                No_of_Items: order.orderItems.length,
+                id: order.id,
+                No_of_Items: order.quantity,
                 Amount: `₹${order.totalPrice}`,
                 Status: order.orderStatus,
                 Items_Price: order.itemsPrice,
-                Order_Items: order.orderItems.name,
-                CreatedAt: order.createdAt,
-                DeliveredAt: order.deliveredAt,
+                Order_Items: order.name,
+                CreatedAt: order.order_date,
+                DeliveredAt: order.delivered_date,
                 PaidAt: order.paidAt,
-                Payment_Info: order.paymentInfo.status,
-                Shipping_Info: order.shippingInfo.address+", "+ order.shippingInfo.city+", "+ order.shippingInfo.country+", "+ order.shippingInfo.phoneNo+", "+ order.shippingInfo.postalCode,
+                Payment_Info: order.paymentStatus,
+                Shipping_Info: order.address+", "+ order.city+", "+ order.country+", "+ order.phoneNo+", "+ order.postalCode,
                 Shipping_Price: order.shippingPrice,
                 Tax_Price: order.taxPrice,
-                User_Id: order.user,
-
+                User_Id: order.user_id,
             })
         })
+    }
         return data;
     }
 
@@ -163,7 +166,6 @@ const OrdersListAll = ({ history }) => {
                 <div style={list} className="col-12 col-md-2">
                     <Sidebar />
                 </div>
-
                 <div className={`col-12 col-md-${list.display === "block" ? 10 : 12}`}>
                     <Fragment>
                     <button className="mt-3" onClick={hide}><i class="fa fa-bars" aria-hidden="true"></i></button>
@@ -179,11 +181,9 @@ const OrdersListAll = ({ history }) => {
                                 />
                             </div>
                         )}
-
                     </Fragment>
                 </div>
             </div>
-
         </Fragment>
     )
 }

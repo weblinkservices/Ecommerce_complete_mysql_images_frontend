@@ -38,50 +38,46 @@ import {
     DELETE_USER_REQUEST,
     DELETE_USER_SUCCESS,
 
-    
+
 } from '../constants/userConstants'
 
 //Login
-export const login = (email, password) => async (dispatch) =>{
+export const login = (email, password) => async (dispatch) => {
     try {
-        dispatch({type:LOGIN_REQUEST})
+        dispatch({ type: LOGIN_REQUEST })
 
-        const config={
+        const config = {
             headers: {
                 'Content-Type': 'application/json'
             }
         }
 
-        const { data } = await axios.post('/api/v1/login', {email, password}, config)
+        const { data } = await axios.post('/api/v1/login/', { email, password }, config)
+        window.location.reload(true);
 
         dispatch({
-            type:LOGIN_SUCCESS,
-            payload:data.user
+            type: LOGIN_SUCCESS,
+            payload: data.user
         })
-        
+
     } catch (error) {
         dispatch({
-            type:LOGIN_FAIL,
-            payload:error.response.data.message
+            type: LOGIN_FAIL,
+            payload: error.response.data.message
         })
-        
     }
 }
 
 // Register user
 export const register = (userData) => async (dispatch) => {
     try {
-
         dispatch({ type: REGISTER_USER_REQUEST })
-
         const config = {
             headers: {
                 'Content-Type': 'multipart/form-data'
             }
         }
-
-        const { data } = await axios.post('/api/v1/register', userData, config)
-
+        const { data } = await axios.post('/api/v1/register', userData,config)
         dispatch({
             type: REGISTER_USER_SUCCESS,
             payload: data.user
@@ -98,11 +94,8 @@ export const register = (userData) => async (dispatch) => {
 // Load user
 export const loadUser = () => async (dispatch) => {
     try {
-
         dispatch({ type: LOAD_USER_REQUEST })
-
         const { data } = await axios.get('/api/v1/me')
-
         dispatch({
             type: LOAD_USER_SUCCESS,
             payload: data.user
@@ -116,11 +109,9 @@ export const loadUser = () => async (dispatch) => {
     }
 }
 
-
 // Update profile
 export const updateProfile = (userData) => async (dispatch) => {
     try {
-
         dispatch({ type: UPDATE_PROFILE_REQUEST })
 
         const config = {
@@ -229,7 +220,7 @@ export const resetPassword = (token, passwords) => async (dispatch) => {
 export const logout = () => async (dispatch) => {
     try {
 
-await axios.get('/api/v1/logout')
+        await axios.get('/api/v1/logout')
 
         dispatch({
             type: LOGOUT_SUCCESS,
@@ -242,7 +233,6 @@ await axios.get('/api/v1/logout')
         })
     }
 }
-
 
 // Get all user
 export const allUsers = () => async (dispatch) => {
@@ -271,7 +261,6 @@ export const updateUser = (id, userData) => async (dispatch) => {
     try {
 
         dispatch({ type: UPDATE_USER_REQUEST })
-
         const config = {
             headers: {
                 'Content-Type': 'application/json'
@@ -296,14 +285,8 @@ export const updateUser = (id, userData) => async (dispatch) => {
 // Get user details - ADMIN
 export const getUserDetails = (id) => async (dispatch) => {
     try {
-
         dispatch({ type: USER_DETAILS_REQUEST })
-
-
         const { data } = await axios.get(`/api/v1/admin/user/${id}`)
-
-        console.log("dd*****************************",data)
-
         dispatch({
             type: USER_DETAILS_SUCCESS,
             payload: data.user
@@ -341,9 +324,9 @@ export const deleteUser = (id) => async (dispatch) => {
 }
 
 //Clear Error
-export const clearErrors = ()=> async (dispatch)=>{
+export const clearErrors = () => async (dispatch) => {
     dispatch({
-        type:CLEAR_ERRORS
+        type: CLEAR_ERRORS
     })
 
 }

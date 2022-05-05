@@ -16,7 +16,7 @@ const ProductsList = ({ history }) => {
     const alert = useAlert();
     const dispatch = useDispatch();
     const { loading, error, products } = useSelector(state => state.products);
-    const { error: deleteError, isDeleted } = useSelector(state => state.product)
+    const { error: deleteError, isDeleted } = useSelector(state => state.product);
     useEffect(() => {
         dispatch(getAdminProducts());
         if (error) {
@@ -70,22 +70,24 @@ const ProductsList = ({ history }) => {
             ],
             rows: []
         }
-        products.forEach(product => {
-            data.rows.push({
-                id: product._id,
-                name: product.name,
-                price: `₹${(product.discountPrice)?.toFixed(2)}`,
-                stock: product.stock,
-                actions: <Fragment>
-                    <Link to={`/admin/product/${product._id}`} className="btn btn-primary py-1 px-2">
-                        <i className="fa fa-pencil"></i>
-                    </Link>
-                    <button className="btn btn-danger py-1 px-2 ml-2" onClick={() => deleteProductHandler(product._id)}>
-                        <i className="fa fa-trash"></i>
-                    </button>
-                </Fragment>
+        if (products) {
+            products.forEach(product => {
+                data.rows.push({
+                    id: product.id,
+                    name: product.name,
+                    price: `₹${(product.sale_price)}`,
+                    stock: product.stock,
+                    actions: <Fragment>
+                        <Link to={`/admin/product/${product.id}`} className="btn btn-primary py-1 px-2">
+                            <i className="fa fa-pencil"></i>
+                        </Link>
+                        <button className="btn btn-danger py-1 px-2 ml-2" onClick={() => deleteProductHandler(product.id)}>
+                            <i className="fa fa-trash"></i>
+                        </button>
+                    </Fragment>
+                })
             })
-        })
+        }
         return data;
     }
     const deleteProductHandler = (id) => {
@@ -101,7 +103,7 @@ const ProductsList = ({ history }) => {
             setList({ display: "block" })
         }
     }
-    
+
     return (
         <Fragment>
             <MetaData title={'All Products'} />
@@ -123,7 +125,6 @@ const ProductsList = ({ history }) => {
                                 hover scrollX scrollY maxHeight='100vh'
                                 autoWidth
                                 exportToCSV
-                                
                             />
                         )}
                     </Fragment>

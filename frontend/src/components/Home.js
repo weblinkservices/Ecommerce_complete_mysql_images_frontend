@@ -41,9 +41,10 @@ const Home = ({ match }) => {
 
   const alert = useAlert();
   const dispatch = useDispatch();
-  const { loading, products, error, productsCount, resPerPage, filteredProductsCount } = useSelector(state => state.products)
+  const { loading, products, error, productsCount, productImages, RelatedProductImages,imagesData, resPerPage, filteredProductsCount } = useSelector(state => state.products)
   const keyword = match.params.keyword
-  console.log("products",products)
+  // console.log("imagesData",imagesData);
+
   useEffect(() => {
     if (error) {
       return alert.error(error)
@@ -55,12 +56,10 @@ const Home = ({ match }) => {
   function setCurrentPageNo(pageNumber) {
     setcurrentPage(pageNumber)
   }
-
   let count = productsCount;
   if (keyword) {
     count = filteredProductsCount
   }
-
   let settings = {
     infinite: false,
     speed: 1000,
@@ -91,29 +90,23 @@ const Home = ({ match }) => {
       "url": "https://picsum.photos/1400/300",
       "title": "abc"
     },
-
     {
       "public_id": 2,
       "url": "https://picsum.photos/1400/300",
       "title": "abc"
     },
-
     {
       "public_id": 3,
       "url": "https://picsum.photos/1400/300",
       "title": "abc"
     }
-
     ]
   }
-
-
   return (
     <Fragment>
       {loading ? <Loader /> : (
         <Fragment>
           <MetaData title={'Buy Best Products Online'} />
-
           {keyword ? ("") : (
             <div>
               <div className="row f-flex justify-content-around">
@@ -128,18 +121,20 @@ const Home = ({ match }) => {
                 </div>
               </div>
               <div className="row slider-bg">
-                <div className="container-fluid mt-3 mb-3"  >
+                <div className="container-fluid mt-3 mb-3">
                   <Slider1 {...settings}>
-                    {products &&
+                    
+                    {products && productImages &&
                       products.map((product) => (
-                        <RelatedItem key={product._id} product={product} />
+                        <RelatedItem key={product.id} product={product} RelatedProductImages={productImages}
+                        />
                       ))}
+
                   </Slider1>
                 </div>
               </div>
             </div>
           )}
-
 
           {keyword ? <h1 id="products_heading" className="serach-result">1-{filteredProductsCount} of over {productsCount} results for <span style={{ color: "#cc3f06" }}>"{keyword}"</span> </h1>
             : <h1 id="products_heading">Latest Products</h1>}
@@ -214,15 +209,16 @@ const Home = ({ match }) => {
                   </div>
                   <div className="col-6 col-md-9">
                     <div className="row">
-                      {products && products.map(product => (
-                        <Product key={product._id} product={product} col={4} />
+
+                      {products && productImages && products.map(product => (
+                        <Product key={product.id} product={product} productImages={productImages} col={4} />
                       ))}
                     </div>
                   </div>
                 </Fragment>
               ) : (
-                products && products.map(product => (
-                  <Product key={product._id} product={product} col={3} />
+                products && productImages && products.map(product => (
+                  <Product key={product._id} product={product} productImages={productImages} col={3} />
                 ))
               )}
             </div>
